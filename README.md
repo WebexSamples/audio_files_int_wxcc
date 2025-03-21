@@ -105,7 +105,7 @@ This project involves integrating with Webex Contact Center using specific envir
 2. Run the following command to clone the repository:
 
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/Joezanini/audio_files_int_wxcc.git
    ```
 3. Navigate to the root directory of the project:
     ```bash
