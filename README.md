@@ -109,7 +109,7 @@ This project involves integrating with Webex Contact Center using specific envir
    ```
 3. Navigate to the root directory of the project:
     ```bash
-    cd audiofiles
+    cd audio_files_int_wxcc
     ```
 ### Set Up the Backend
 1. install dependencies
