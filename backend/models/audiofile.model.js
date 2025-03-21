@@ -1,20 +1,46 @@
-import { contentType, links } from "express/lib/response";
-import mongoose, { version } from "mongoose";
+import mongoose from 'mongoose';
 
-const audioFileSchema = mongoose.Schema({
-    id: { type: String, required: true },
-    name: { type: String, required: true },
-    contentType: { type: String, required: true },
-    blobId: { type: String, required: true },
-    organizationId: { type: String, required: true },
-    url: { type: URL, required: true },
-    createdTime: { type: BigInt64Array, required: true },
-    lastUpdatedTime: { type: BigInt64Array, required: true },
-    version: { type: Int32, required: true },
-}, {
-    timestamps: true // createdAt and updatedAt fields
+const audiofileSchema = new mongoose.Schema({
+    organizationId: {
+        type: String,
+    },
+    id: {
+        type: String,
+    },
+    version: {
+        type: String
+    },
+    name: {
+        type: String,
+        required: true
+    },
+    contentType: {
+        type: String,
+        required: true
+    },
+    blobId: {
+        type: String,
+    },
+    url: {
+        type: String,
+    },
+    description: {
+        type: String,
+    },
+    systemDefault: {
+        type: Boolean,
+    },
+    createdTime: {
+        type: Number,
+    },
+    lastUpdatedTime: {
+        type: Number,
+    }
+},
+{
+    timestamps: true,
 });
 
-const AudioFile = mongoose.model('AudioFile', audioFileSchema);
+const AudioFile = mongoose.model('AudioFile', audiofileSchema);
 
 export default AudioFile;
