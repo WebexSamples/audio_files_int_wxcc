@@ -4,6 +4,28 @@ import { getUserInfo, getTokens } from "../utils/user.utils.js";
 import mongoose from "mongoose";
 import { listAudioFilesApi } from "../utils/audiofile.utils.js";
 
+function addAudioFiles(audiofiles) {
+    return new Promise(async (resolve, reject) => {
+        for (let i = 0; i < audiofiles.length; i++) {
+            let audiofile = await AudioFile.find({ name: audiofiles[i].name });
+            if (audiofile.length === 0) {
+                let newAudioFile = new AudioFile(audiofiles[i]);
+                try {
+                    if (!newAudioFile.organizationId) {
+                        //console.log(`${newAudioFile.name} has no org_id`);
+                        newAudioFile.organizationId = user.orgId;
+                        //console.log(`assigned org_id : ${newAudioFile.organizationId}`);
+                    }
+                    await newAudioFile.save();
+                } catch (error) {
+                    console.error("Error Saving Audio File to db : ", error.message);
+                }
+            }
+        }
+        resolve();
+    });
+}
+
 export const createUsers = async (req, res) => {
     const code = req.body.code;
 
@@ -22,10 +44,6 @@ export const createUsers = async (req, res) => {
 
     const userInfo = await getUserInfo(response.data.access_token);
 
-    const data = await listAudioFilesApi(response.data.access_token, org_id)
-
-    const audiofiles = data.data;
-
     const user = {
         openidProviderId : "https://idbroker-b-us.webex.com/idb",
         givenName : userInfo.given_name,
@@ -36,22 +54,11 @@ export const createUsers = async (req, res) => {
         orgId: org_id,
     };
 
-    for (let i = 0; i < audiofiles.length; i++) {
-        let audiofile = await AudioFile.find({ name: audiofiles[i].name });
-        if (audiofile.length === 0) {
-            let newAudioFile = new AudioFile(audiofiles[i]);
-            try {
-                if (!newAudioFile.organizationId) {
-                    //console.log(`${newAudioFile.name} has no org_id`);
-                    newAudioFile.organizationId = user.orgId;
-                    //console.log(`assigned org_id : ${newAudioFile.organizationId}`);
-                }
-                await newAudioFile.save();
-            } catch (error) {
-                console.error("Error Saving Audio File to db : ", error.message);
-            }
-        }
-    }
+    //const data = await listAudioFilesApi(userInfo.email);
+
+    //const audiofiles = data.data;
+
+    //await addAudioFiles(audiofiles);
 
 
     try {

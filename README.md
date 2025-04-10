@@ -20,14 +20,14 @@ Registering an [integration(https://developer.webex-cx.com/documentation/integra
 - log in [here](https://developer.webex-cx.com/).
 - select My Webex Apps from the menu under your avatar at the top of this page.
 - You'll need to provide some basic information such as the name and description of your integration.
-- Provide redirect URI(s) and scopes during registration. For more information on scopes, please see the section below about the environment variables and get the redirect from there.
+- Provide redirect URI(s) and scopes during registration (maybe the example redirect from the environment variable section below). For more information on scopes, please see the section below about the environment variables and get the redirect from there.
 
 - After successful registration, you'll be taken to a different screen that displays your integration's newly created Client ID and Client Secret. The Client Secret will only be shown once so please copy it and keep it safe!
 
 To create and manage audio files, you need:
 
 - **Adminstrator Role**: you can get a developer sandbox [here](https://developer.webex-cx.com/sandbox).
-- **The appropriate scopes**: ```cjp:config_write``` or ```cjp:config_read```.
+- **The appropriate scopes**: ```cjp:config_write``` AND ```cjp:config_read```.
 
 ### API ENDPOINT
 
@@ -51,6 +51,18 @@ List Audio Files
 
 Follow these steps to get the application up and running:
 
+### Clone the Repository
+
+1. Open your terminal.
+2. Run the following command to clone the repository:
+
+   ```bash
+   git clone https://github.com/Joezanini/audio_files_int_wxcc.git
+   ```
+3. Navigate to the root directory of the project:
+    ```bash
+    cd audio_files_int_wxcc
+
 ### Environment Variables
 
 This project involves integrating with Webex Contact Center using specific environment variables for configuration. To ensure the application works correctly, you need to rename the `.env.example` file to `.env` and provide the correct values for each variable.
@@ -69,7 +81,7 @@ This project involves integrating with Webex Contact Center using specific envir
 
 - **MONGO_URI**:
   - Format: `mongodb+srv://YOURCLUSTER.mongodb.net/`
-  - Description: The connection URI for your MongoDB cluster. Ensure this URI points to the correct cluster used for storing application data.
+  - Description: The [connection URI](https://www.mongodb.com/docs/guides/atlas/connection-string/) for your MongoDB cluster. Ensure this URI points to the correct cluster used for storing application data.
 
 - **PORT**:
   - Example: `5000`
@@ -92,25 +104,17 @@ This project involves integrating with Webex Contact Center using specific envir
 
 - **OAuth Authorize URL**:
 
-    - Change the ```OAUTH AUTHORIZE URL``` in ```frontend/src/pages/Home.jsx``` to the proper Authorization url provided in the black box on the integration registration page. (My Apps section of Webex developer portal)
+    - Change the ```OAUTH AUTHORIZE URL``` in ```frontend/src/pages/Home.jsx``` to the proper Authorization url provided in the black box on the integration registration page. (My Apps section of Webex developer portal). Be sure to include the Login With Webex Scopes in the url.
+    ```bash
+    https://developer.webex-cx.com/oauth/authorize?client_id=YOUR_CLIENT_ID&response_type=code&redirect_uri=YOUR_REDIRECT_URI&scope=spark%3Akms%20cjp%3Aconfig_write%20cjp%3Aconfig_read%20openid%20email%20profile
+    ```
 
 ## Important Notes
 
 - Keep the `.env` file secure and do not expose it in public repositories.
 - Verify that each value is correct and corresponds to your Webex Contact Center setup and MongoDB configuration.
+- If you encounter any issues, double-check the values and ensure they align with your Webex Contact Center and MongoDB configurations.
 
-### Clone the Repository
-
-1. Open your terminal.
-2. Run the following command to clone the repository:
-
-   ```bash
-   git clone https://github.com/Joezanini/audio_files_int_wxcc.git
-   ```
-3. Navigate to the root directory of the project:
-    ```bash
-    cd audio_files_int_wxcc
-    ```
 ### Set Up the Backend
 1. install dependencies
     ```bash
@@ -137,5 +141,5 @@ This project involves integrating with Webex Contact Center using specific envir
     npm run dev
     ```
     This will start the frontend using Vite. You can view the app in your
-    browser at the URL provided in the terminal. It is suggested to do this incognito to prevent session sharing. Use the developer sandbox admin credentials.
+    browser at the URL provided in the terminal. It is suggested to do this incognito to prevent session sharing. Use the developer sandbox admin credentials or create a new admin account to test the application.
 

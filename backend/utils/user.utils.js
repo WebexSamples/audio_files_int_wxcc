@@ -54,6 +54,7 @@ async function verifyJwt(token) {
 }
 
 export const getTokens = async function (code) {
+
     const payload = {
         grant_type: 'authorization_code',
         client_id: process.env.CLIENT_ID,

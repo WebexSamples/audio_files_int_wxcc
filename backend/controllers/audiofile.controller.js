@@ -13,14 +13,10 @@ export const createAudioFile = async (req, res) => {
         return res.status(400).json({ success: false, message: "No file uploaded." });
     }
 
-    // Access the file buffer (binary data)
-    //const fileBuffer = req.file.buffer;
     const file = req.file;
     const filename = req.body.filename;
-    //const description = req.body.description;
     const email = req.body.email;
     console.log("file in controller : ", file);
-    //console.log("description in controller : ", description);
     console.log("filename in controller : ", filename);
 
     let audiofile = await AudioFile.find({ name: filename });
@@ -31,11 +27,10 @@ export const createAudioFile = async (req, res) => {
     const newFile = {
         name : filename,
         file : file,
-        email : email,
     }
 
     try {
-        const data = await createAudioFileApi(newFile);
+        const data = await createAudioFileApi(newFile, email);
         console.log("data post upload : ", data);
         return res.json({ success: true, data: data });
     } catch (error) {
@@ -48,15 +43,10 @@ export const deleteAudioFile = async (req, res) => {
     const {id} = req.params;
     const { email } = req.query;
     console.log(`email in delete controller : ${email}`);
-    const query = User.findOne({ email: email });
-    query.getFilter();
-    const user = await query.exec();
     console.log("id: ", id);
-    console.log("email in delete : ", email);
-    console.log("token : ", user.accessToken);
 
     try {
-        await deleteAudioFileApi(id, user.accessToken, user.orgId);
+        await deleteAudioFileApi(id, email);
         await AudioFile.findByIdAndDelete(id);
         res.status(200).json({ success:true, message: "Audio File Deleted Controller"});
     } catch (error) {
@@ -102,13 +92,10 @@ export const listReferencesAudioFile = async (req, res) => {
 
 export const listAudioFiles = async (req, res) => {
     const { email } = req.query;
-    console.log(`email : ${email}`);
-    const query = User.findOne({ email: email });
-    query.getFilter();
-    const user = await query.exec();
+    const user = await User.findOne({ email: email });
 
     try {
-        const data = await listAudioFilesApi(user.accessToken, user.orgId);
+        const data = await listAudioFilesApi(email);
 
         const audiofiles = data.data;
 
@@ -125,6 +112,7 @@ export const listAudioFiles = async (req, res) => {
                     await newAudioFile.save();
                 } catch (error) {
                     console.error("Error Saving Audio File to db : ", error.message);
+                    console.log("Error info : ", error);
                 }
             }
         }

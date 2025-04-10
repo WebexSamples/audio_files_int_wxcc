@@ -2,13 +2,10 @@ import dotenv from 'dotenv'
 import axios from 'axios'
 import User from "../models/user.model.js";
 import AudioFile from '../models/audiofile.model.js';
-import { Blob } from 'blob-polyfill';
 import FormData from 'form-data';
 import fs from 'fs';
-import path, { resolve } from 'path';
+import path from 'path';
 import { fileURLToPath } from 'url';
-import mongoose from "mongoose";
-import { rejects } from 'assert';
 
 dotenv.config();
 
@@ -28,24 +25,27 @@ function writeFileLocally(file) {
   });
 }
 
-function readFileLocally(filename) {
+function deleteFileLocally(filePath) {
   return new Promise((resolve, reject) => {
-    const filePath = path.join(__dirname, filename);
-    fs.readFile(filePath, (err, data) => {
+    fs.unlink(filePath, (err) => {
       if (err) {
         reject(err);
       } else {
-        resolve(data);
+        resolve();
       }
     });
   });
 }
 
-export const listAudioFilesApi = async function (accessToken, orgid) {
-    const response = await axios.get(`https://api.wxcc-us1.cisco.com/organization/${orgid}/v2/audio-file`, {
+export const listAudioFilesApi = async function (email) {
+    const query = User.findOne({ email: email });
+    query.getFilter();
+    const user = await query.exec();
+
+    const response = await axios.get(`https://api.wxcc-us1.cisco.com/organization/${user.orgId}/v2/audio-file`, {
         headers: {
             'Accept': 'application/json',
-            'Authorization': `Bearer ${accessToken}`
+            'Authorization': `Bearer ${user.accessToken}`
         }
     }).catch(error => {
         if (error.response) {
@@ -69,19 +69,22 @@ export const listAudioFilesApi = async function (accessToken, orgid) {
     return response.data;
 }
 
-export const deleteAudioFileApi = async function (id, accessToken, org_id) {
+export const deleteAudioFileApi = async function (id, email) {
 
   const file = await AudioFile.findById(id).exec();
+
+  const query = User.findOne({ email: email });
+  query.getFilter();
+  const user = await query.exec();
 
   console.log("file : ", file.name);
   console.log("webex id : ", file.id);
   console.log("mongo id : ", id);
-  console.log("access token : ", accessToken);
 
-  const response = axios.delete(`https://api.wxcc-us1.cisco.com/organization/${org_id}/audio-file/${file.id}`, {
+  const response = axios.delete(`https://api.wxcc-us1.cisco.com/organization/${user.orgId}/audio-file/${file.id}`, {
     headers: {
       'Accept': 'application/json',
-      'Authorization': `Bearer ${accessToken}`,
+      'Authorization': `Bearer ${user.accessToken}`,
     }
   })
   .then(function (response) {
@@ -93,8 +96,8 @@ export const deleteAudioFileApi = async function (id, accessToken, org_id) {
   return response.data;
 }
 
-export const createAudioFileApi = async function (file) {
-  const query = User.findOne({ email: file.email });
+export const createAudioFileApi = async function (file, email) {
+  const query = User.findOne({ email: email });
   query.getFilter();
   const user = await query.exec();
   const formData = new FormData();
@@ -118,7 +121,7 @@ export const createAudioFileApi = async function (file) {
     contentType: 'application/json'
   });
 
-  //console.log('FORM DATA : ', formData);
+
   const response = await axios.post(`https://api.wxcc-us1.cisco.com/organization/${user.orgId}/audio-file`, formData, {
     headers: {
         'Accept': '*/*',
@@ -142,18 +145,8 @@ export const createAudioFileApi = async function (file) {
         code: error.code || 'AUDIO_FILES_ERROR'
     };
   });
-
+  await deleteFileLocally(writeFile);
   return response.data;
-}
-
-export const updateAudioFileApi = async function (id, email, description) {
-  const query = User.findOne({ email: email });
-  query.getFilter();
-  const user = await query.exec();
-}
-
-export const deleteAudioFile = async function (accessToken) {
-
 }
 
 export const partiallyUpdateAudioFiles = async function (id, email, description) {
