@@ -85,7 +85,7 @@ This project involves integrating with Webex Contact Center using specific envir
 
 - **PORT**:
   - Example: `5000`
-  - Description: The port number on which your application will run. You can use the default port or choose another available port.
+  - Description: The port number on which your application will run. You can use the default port or choose another available port. **if you change the port, you need to change the value if the proxy field in the [vite.config.js](frontend/vite.config.js) file**
 
 - **CLIENT_ID**:
   - Format: `YOUR_WXCC_CLIENTID`
