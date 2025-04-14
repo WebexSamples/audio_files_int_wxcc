@@ -104,7 +104,7 @@ This project involves integrating with Webex Contact Center using specific envir
 
 - **OAuth Authorize URL**:
 
-    - Change the ```OAUTH AUTHORIZE URL``` in ```frontend/src/pages/Home.jsx``` to the proper Authorization url provided in the black box on the integration registration page. (My Apps section of Webex developer portal). Be sure to include the Login With Webex Scopes in the url.
+    - Change the ```OAUTH AUTHORIZE URL``` in ```frontend/src/pages/Home.jsx``` to the proper Authorization url provided in the black box on the integration registration page. (My Apps section of Webex developer portal). **Be sure to include the Login With Webex Scopes in the url. The app uses the information provided via OpenId Connect to authenticate the user and authorize the app to access the user's data.**
     ```bash
     https://developer.webex-cx.com/oauth/authorize?client_id=YOUR_CLIENT_ID&response_type=code&redirect_uri=YOUR_REDIRECT_URI&scope=spark%3Akms%20cjp%3Aconfig_write%20cjp%3Aconfig_read%20openid%20email%20profile
     ```
