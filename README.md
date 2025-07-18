@@ -1,145 +1,409 @@
-# AudioFiles
+# Webex Contact Center Audio Files Integration
 
-AudioFiles is a web application built using the MERN stack (MongoDB, Express.js, React, Node.js). This application allows users to manage and play audio files.
+A comprehensive MERN stack (MongoDB, Express.js, React, Node.js) application that demonstrates how to integrate with the Webex Contact Center Audio Files API. This full-stack web application enables administrators to manage .wav audio files that can be played to customers in queues or during call hold scenarios in Webex Contact Center environments.
 
-## Prerequisites
+## 🎯 Features
 
-Before you begin, ensure you have met the following requirements:
+This sample demonstrates how to use the Webex Contact Center Audio Files API to:
 
-- **Node.js**: Install Node.js from [nodejs.org](https://nodejs.org/).
-- **npm**: Node Package Manager is included with Node.js.
-- **MongoDB**: Set up a MongoDB database. You can use a local instance or a cloud service like MongoDB Atlas.
-- **Git**: Install Git from [git-scm.com](https://git-scm.com/).
+* **Upload audio files** (.wav format) to your Webex Contact Center organization
+* **List existing audio files** with metadata and playback controls
+* **Update audio file properties** such as name and description
+* **Delete audio files** from your organization
+* **OAuth authentication** integration with Webex Contact Center
+* **Real-time file management** with modern React UI
+* **Secure API integration** using proper authentication flows
 
-**Webex Contact Center Integration Setup**
+## 📚 Integration Overview
 
-This integration enables developers to manage .wav audio files within an organization. These audio files can be played to customers when calls are queued on the network until they are distributed to a team with available capacity. Additionally, audio files can be integrated into a Routing Strategy to play when an agent puts a call on hold.
+This application integrates with Webex Contact Center to manage audio files that can be:
+- Played to customers when calls are queued until distributed to available agents
+- Integrated into Routing Strategies for hold music
+- Used for various customer experience scenarios
 
-Registering an [integration(https://developer.webex-cx.com/documentation/integrations).
+## 🚀 Quick Start
 
-- log in [here](https://developer.webex-cx.com/).
-- select My Webex Apps from the menu under your avatar at the top of this page.
-- You'll need to provide some basic information such as the name and description of your integration.
-- Provide redirect URI(s) and scopes during registration (maybe the example redirect from the environment variable section below). For more information on scopes, please see the section below about the environment variables and get the redirect from there.
+### Prerequisites
 
-- After successful registration, you'll be taken to a different screen that displays your integration's newly created Client ID and Client Secret. The Client Secret will only be shown once so please copy it and keep it safe!
+- **Node.js**: Version 14+ from [nodejs.org](https://nodejs.org/)
+- **MongoDB**: Local instance or cloud service like MongoDB Atlas
+- **Webex Contact Center**: Administrator role and developer sandbox access
+- **Webex Integration**: Registered integration with proper scopes
 
-To create and manage audio files, you need:
+### Getting Your Webex Integration
 
-- **Adminstrator Role**: you can get a developer sandbox [here](https://developer.webex-cx.com/sandbox).
-- **The appropriate scopes**: ```cjp:config_write``` AND ```cjp:config_read```.
+1. **Register Integration**: Go to [Webex Contact Center Developer Portal](https://developer.webex-cx.com/)
+2. **Sign in** with your Webex account
+3. **Navigate to**: My Webex Apps from the menu under your avatar
+4. **Create Integration** with:
+   - **Required Scopes**: `cjp:config_write` AND `cjp:config_read` AND `openid` AND `email` AND `profile`
+   - **Redirect URI**: `http://localhost:5173/oauth` (for development)
+5. **Save** your Client ID and Client Secret (shown only once!)
 
-### API ENDPOINT
+> **Administrator Role Required**: You need administrator privileges to manage audio files. Get a developer sandbox [here](https://developer.webex-cx.com/sandbox).
 
-Create a New Audio File
-- **Endpoint**: ```POST /organization/{orgid}/audio-file```
-- **Description**: Create a new audio file in a given organization
+### Setup Instructions
 
-Delete Specific Audio File by ID
-- **Endpoint**: ```DELETE /organization/{orgid}/audio-file/{id}```
-- **Description**: Delete an existing audio file by ID in a given organization.
-
-Partially Update Audio File by ID
-- **Endpoint**: ```PATCH /organization/{orgid}/audio-file/{id}```
-- **Description**: Partially update an audio file by ID in a given organization.
-
-List Audio Files
-- **Endpoint**: ```GET /organization/{orgid}/v2/audio-file```
-- **Description**: Retrieve a list of audio files in a given organization.
-
-### Getting Started
-
-Follow these steps to get the application up and running:
-
-### Clone the Repository
-
-1. Open your terminal.
-2. Run the following command to clone the repository:
-
+1. **Clone the repository**:
    ```bash
    git clone https://github.com/Joezanini/audio_files_int_wxcc.git
+   cd audio_files_int_wxcc
    ```
-3. Navigate to the root directory of the project:
-    ```bash
-    cd audio_files_int_wxcc
 
-### Environment Variables
+2. **Configure environment variables**:
+   ```bash
+   cp .env.example .env
+   ```
+   
+   Edit `.env` with your values:
+   ```bash
+   MONGO_URI=mongodb+srv://YOURCLUSTER.mongodb.net/
+   PORT=5000
+   CLIENT_ID=YOUR_WXCC_CLIENTID
+   CLIENT_SECRET=YOUR_WXCC_CLIENTSECRET
+   REDIRECT_URI=http://localhost:5173/oauth
+   ```
 
-This project involves integrating with Webex Contact Center using specific environment variables for configuration. To ensure the application works correctly, you need to rename the `.env.example` file to `.env` and provide the correct values for each variable.
+3. **Update OAuth URL** in [`frontend/src/pages/Home.jsx`](frontend/src/pages/Home.jsx):
+   ```javascript
+   const oauthApi = 'https://webexapis.com/v1/authorize?client_id=YOUR_CLIENT_ID&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2Foauth&scope=spark%3Akms%20cjp%3Aconfig_write%20cjp%3Aconfig_read%20openid%20email%20profile&state=set_state_here';
+   ```
 
-## Steps to Configure Environment Variables
+4. **Install dependencies and start backend**:
+   ```bash
+   npm install
+   npm run dev
+   ```
 
-1. **Rename the File**:
-   - Navigate to the root directory of your project.
-   - Rename the `.env.example` file to `.env`.
+5. **Install frontend dependencies and start** (new terminal):
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
 
-2. **Fill in the Environment Variables**:
-   - Open the newly renamed `.env` file.
-   - Replace the placeholder values with your actual configuration details.
+6. **Access the application**: Open your browser to the URL shown in terminal (typically `http://localhost:5173`)
+
+## 📁 Project Structure
+
+```
+audio_files_int_wxcc/
+├── backend/                    # Express.js backend server
+│   ├── config/                 # Database configuration
+│   ├── controllers/            # API endpoint controllers
+│   │   └── audiofile.controller.js  # Audio file CRUD operations
+│   ├── models/                 # MongoDB models
+│   ├── routes/                 # API routes
+│   │   ├── audiofile.route.js  # Audio file endpoints
+│   │   └── user.route.js       # User authentication routes
+│   ├── utils/                  # Utility functions
+│   └── server.js              # Main server file
+├── frontend/                   # React frontend application
+│   ├── src/
+│   │   ├── components/         # Reusable UI components
+│   │   ├── pages/              # Application pages
+│   │   │   ├── Home.jsx        # Login/OAuth entry point
+│   │   │   ├── OAuth.jsx       # OAuth callback handler
+│   │   │   ├── Audiofiles.jsx  # Audio files management
+│   │   │   ├── Upload.jsx      # File upload interface
+│   │   │   └── Update.jsx      # File update interface
+│   │   ├── store/              # State management
+│   │   └── App.jsx            # Main React application
+│   ├── vite.config.js         # Vite configuration
+│   └── package.json           # Frontend dependencies
+├── .env.example               # Environment variables template
+├── package.json               # Backend dependencies
+└── README.md                  # This file
+```
+
+## 🔧 API Integration
+
+### Webex Contact Center Audio Files API
+
+| Operation | Endpoint | Description | Implementation |
+|-----------|----------|-------------|----------------|
+| **Create** | `POST /organization/{orgid}/audio-file` | Upload new audio file | `createAudioFile()` |
+| **List** | `GET /organization/{orgid}/v2/audio-file` | Retrieve all audio files | `listAudioFiles()` |
+| **Update** | `PATCH /organization/{orgid}/audio-file/{id}` | Partially update file metadata | `patchAudioFile()` |
+| **Delete** | `DELETE /organization/{orgid}/audio-file/{id}` | Remove audio file | `deleteAudioFile()` |
+
+### Authentication Flow
+
+The application uses OAuth 2.0 authorization code flow:
+
+1. **Redirect to Webex**: User clicks "Login with Webex"
+2. **User Authorization**: Webex prompts for permission
+3. **Authorization Code**: Webex redirects with code
+4. **Token Exchange**: Backend exchanges code for access token
+5. **API Access**: Use token for Webex Contact Center API calls
+
+## 🎨 User Interface
+
+### Technology Stack
+
+- **React 19**: Modern UI framework with hooks
+- **Chakra UI**: Component library for consistent design
+- **React Router**: Client-side routing
+- **Zustand**: Lightweight state management
+- **Vite**: Fast development and build tool
+
+### Key Components
+
+- **Home Page**: OAuth login entry point with Webex branding
+- **Audio Files Manager**: List, play, and manage uploaded files
+- **Upload Interface**: Drag-and-drop file upload with validation
+- **Update Modal**: Edit file metadata and properties
+- **Responsive Design**: Works on desktop and mobile devices
+
+## 🔐 Authentication & Security
+
+### OAuth 2.0 Implementation
+
+```javascript
+// OAuth redirect in Home.jsx
+const oauthApi = 'https://webexapis.com/v1/authorize?client_id=YOUR_CLIENT_ID&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2Foauth&scope=spark%3Akms%20cjp%3Aconfig_write%20cjp%3Aconfig_read%20openid%20email%20profile';
+
+function redirectOauth() {
+  location.href = oauthApi;
+}
+```
+
+### Required Scopes
+
+- `cjp:config_write`: Create and modify audio files
+- `cjp:config_read`: Read audio file information
+- `openid`: OpenID Connect authentication
+- `email`: User email access
+- `profile`: User profile information
+
+## 📡 Backend Implementation
+
+### Express.js Server Structure
+
+```javascript
+// server.js - Main server setup
+import express from 'express'
+import dotenv from 'dotenv'
+import { connectDB } from './config/db.js';
+import audiofileRoutes from "./routes/audiofile.route.js";
+
+const app = express();
+app.use(express.json());
+app.use("/api/audiofiles", audiofileRoutes);
+```
+
+### File Upload Handling
+
+```javascript
+// audiofile.route.js - Multer configuration
+import multer from 'multer';
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+router.post("/", upload.single('file'), createAudioFile);
+```
+
+### Database Integration
+
+- **MongoDB**: Document storage for user data and file metadata
+- **Mongoose**: ODM for schema validation and queries
+- **Models**: User authentication and audio file tracking
+
+## 🌐 Frontend Implementation
+
+### React Router Configuration
+
+```javascript
+// App.jsx - Route structure
+<Routes>
+  <Route path='/' element={<Home/>} />
+  <Route path='/audiofiles' element={<Audiofiles/>} />
+  <Route path='/oauth' element={<OAuth/>} />
+  <Route path='/upload' element={<Upload />} />
+  <Route path='/update' element={<Update />} />
+</Routes>
+```
+
+### State Management
+
+- **Zustand**: Lightweight state management for user authentication
+- **React Hooks**: Local component state for UI interactions
+- **Context**: Shared authentication state across components
+
+## 🚀 Development
+
+### Local Development Setup
+
+1. **Backend Development**:
+   ```bash
+   npm run dev  # Uses nodemon for auto-restart
+   ```
+
+2. **Frontend Development**:
+   ```bash
+   cd frontend
+   npm run dev  # Vite dev server with HMR
+   ```
+
+3. **Production Build**:
+   ```bash
+   cd frontend
+   npm run build
+   npm run preview
+   ```
+
+### Development Tools
+
+- **Nodemon**: Auto-restart backend on file changes
+- **Vite**: Fast frontend development with Hot Module Replacement
+- **ESLint**: Code linting and formatting
+- **MongoDB Compass**: Database visualization and management
+
+## 📝 Code Examples
+
+### Audio File Upload
+
+```javascript
+// Example upload implementation
+const uploadAudioFile = async (file, metadata) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('name', metadata.name);
+  formData.append('description', metadata.description);
+  
+  const response = await fetch('/api/audiofiles', {
+    method: 'POST',
+    body: formData,
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  });
+  
+  return response.json();
+};
+```
+
+### Audio File Listing
+
+```javascript
+// Example list retrieval
+const listAudioFiles = async () => {
+  const response = await fetch('/api/audiofiles', {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  });
+  
+  const audioFiles = await response.json();
+  return audioFiles;
+};
+```
+
+## 🔧 Environment Configuration
 
 ### Required Environment Variables
 
-- **MONGO_URI**:
-  - Format: `mongodb+srv://YOURCLUSTER.mongodb.net/`
-  - Description: The [connection URI](https://www.mongodb.com/docs/guides/atlas/connection-string/) for your MongoDB cluster. Ensure this URI points to the correct cluster used for storing application data.
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `MONGO_URI` | MongoDB connection string | `mongodb+srv://cluster.mongodb.net/` |
+| `PORT` | Backend server port | `5000` |
+| `CLIENT_ID` | Webex Contact Center client ID | `YOUR_WXCC_CLIENTID` |
+| `CLIENT_SECRET` | Webex Contact Center client secret | `YOUR_WXCC_CLIENTSECRET` |
+| `REDIRECT_URI` | OAuth redirect URI | `http://localhost:5173/oauth` |
 
-- **PORT**:
-  - Example: `5000`
-  - Description: The port number on which your application will run. You can use the default port or choose another available port. **if you change the port, you need to change the value if the proxy field in the [vite.config.js](frontend/vite.config.js) file**
+### Port Configuration
 
-- **CLIENT_ID**:
-  - Format: `YOUR_WXCC_CLIENTID`
-  - Description: The client ID provided by Webex Contact Center for authentication. This should be replaced with your actual client ID.
+> **Important**: If you change the `PORT` from 5000, update the proxy configuration in [`frontend/vite.config.js`](frontend/vite.config.js):
 
-- **CLIENT_SECRET**:
-  - Format: `YOUR_WXCC_CLIENTSECRET`
-  - Description: The client secret associated with your Webex Contact Center client ID. This is used for secure authentication.
+```javascript
+// vite.config.js
+export default defineConfig({
+  server: {
+    proxy: {
+      '/api': 'http://localhost:5000'  // Update port here
+    }
+  }
+});
+```
 
-- **REDIRECT_URI**:
-  - Example: `http://localhost:5173/oauth`
-  - Description: The URI to redirect to after authentication. Ensure this matches the redirect URI configured in your Webex Contact Center settings.
+## 🛠️ Troubleshooting
 
-- Save the `.env` file after updating the values.
-- Ensure the application can read these values correctly by restarting the application if necessary.
+### Common Issues
 
-- **OAuth Authorize URL**:
+| Issue | Solution |
+|-------|----------|
+| **OAuth redirect fails** | Verify redirect URI matches integration settings |
+| **Upload fails** | Check file format (.wav only) and size limits |
+| **API authentication errors** | Confirm scopes and token validity |
+| **Frontend proxy errors** | Ensure backend is running on correct port |
+| **MongoDB connection fails** | Verify connection string and network access |
 
-    - Change the ```OAUTH AUTHORIZE URL``` in ```frontend/src/pages/Home.jsx``` to the proper Authorization url provided in the black box on the integration registration page. (My Apps section of Webex developer portal). **Be sure to include the Login With Webex Scopes in the url. The app uses the information provided via OpenId Connect to authenticate the user and authorize the app to access the user's data.**
-    ```bash
-    https://developer.webex-cx.com/oauth/authorize?client_id=YOUR_CLIENT_ID&response_type=code&redirect_uri=YOUR_REDIRECT_URI&scope=spark%3Akms%20cjp%3Aconfig_write%20cjp%3Aconfig_read%20openid%20email%20profile
-    ```
+### Debug Steps
 
-## Important Notes
+1. **Check browser console** for JavaScript errors
+2. **Verify environment variables** are loaded correctly
+3. **Test API endpoints** directly with tools like Postman
+4. **Monitor network tab** for failed requests
+5. **Check backend logs** for server errors
 
-- Keep the `.env` file secure and do not expose it in public repositories.
-- Verify that each value is correct and corresponds to your Webex Contact Center setup and MongoDB configuration.
-- If you encounter any issues, double-check the values and ensure they align with your Webex Contact Center and MongoDB configurations.
+## 🔒 Security Considerations
 
-### Set Up the Backend
-1. install dependencies
-    ```bash
-    npm install
-    ```
-2. start the backend server :
-    ```bash
-    npm run dev
-    ```
-    This will start the backend server using nodemon. The server will
-    automatically restart if you make any changes to the backend code.
+### Production Deployment
 
-### Set Up the Frontend
-1. Open a new terminal window and navigate to the frontend directory:
-    ```bash
-    cd frontend
-    ```
-2. Install the frontend dependencies:
-    ```bash
-    npm install
-    ```
-3. Start the Frontend development server :
-    ```bash
-    npm run dev
-    ```
-    This will start the frontend using Vite. You can view the app in your
-    browser at the URL provided in the terminal. It is suggested to do this incognito to prevent session sharing. Use the developer sandbox admin credentials or create a new admin account to test the application.
+1. **Environment Security**:
+   - Never commit `.env` files to version control
+   - Use secure environment variable management
+   - Rotate client secrets regularly
 
+2. **Authentication**:
+   - Implement proper token refresh mechanisms
+   - Add rate limiting to API endpoints
+   - Validate file uploads thoroughly
+
+3. **File Security**:
+   - Scan uploaded files for malware
+   - Implement file size and type restrictions
+   - Use secure file storage solutions
+
+## 📚 Learning Path
+
+1. **Understand Webex Contact Center**: Learn about audio file use cases in contact centers
+2. **Study OAuth Flow**: Understand authorization code flow implementation
+3. **Explore MERN Stack**: Familiarize yourself with MongoDB, Express, React, Node.js
+4. **Practice API Integration**: Work with RESTful APIs and file uploads
+5. **Build Extensions**: Add features like batch upload, audio preview, or file conversion
+
+## 🔗 Related Resources
+
+- [Webex Contact Center Developer Portal](https://developer.webex-cx.com/)
+- [Audio Files API Documentation](https://developer.webex-cx.com/documentation/integrations)
+- [Webex Contact Center Sandbox](https://developer.webex-cx.com/sandbox)
+- [OAuth 2.0 Authorization Code Flow](https://developer.webex.com/docs/oauth)
+- [MongoDB Atlas Documentation](https://docs.atlas.mongodb.com/)
+- [React Documentation](https://react.dev/)
+- [Chakra UI Components](https://chakra-ui.com/)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/new-feature`)
+3. Make your changes and test thoroughly
+4. Commit your changes (`git commit -m 'Add new feature'`)
+5. Push to the branch (`git push origin feature/new-feature`)
+6. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the terms specified in the [LICENSE](LICENSE) file.
+
+## 🆘 Support
+
+- **Issues**: Create an issue in this repository
+- **Webex Developer Support**: Visit [Webex Developer Support](https://developer.webex.com/support)
+- **Contact Center Documentation**: Check [Webex Contact Center Docs](https://developer.webex-cx.com/documentation)
+- **Community**: Join the [Webex Developer Community](https://developer.webex.com/community)
+
+---
+
+**Repository**: https://github.com/Joezanini/audio_files_int_wxcc
